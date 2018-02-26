@@ -69,6 +69,8 @@ Graph
 ggplot(bp.sorted, aes(caught, diff_mass, colour = band, group = band))+
   geom_point()+
   geom_line()+
+  xlab("Time of Year")+
+  ylab("Mass (in grams, relative to capture date)")+
   facet_wrap(~location, nrow = 1)+
   theme(legend.position = 'none')
 ```
