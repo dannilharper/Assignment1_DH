@@ -1,0 +1,76 @@
+---
+title: "Blackpoll"
+author: "Danni Harper"
+date: "February 16, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+Read in data
+```{r}
+blackpoll <- read_rds("~/RMII/Blackpoll_Harper/blpw.all.RDS")
+View(blackpoll)
+```
+
+
+Load date and time package
+```{r}
+library(lubridate)
+```
+Make date column
+```{r}
+blackpoll <- blackpoll %>%
+  mutate(date = make_date(year, month, day))
+```
+
+
+Make date column with just month and day (for displaying all years together)
+```{r}
+blackpoll <- blackpoll %>%
+  mutate(caught = make_date(!year, month, day))
+```
+
+See what columns are
+```{r}
+sapply(blackpoll, class)
+```
+
+Change date columns to integers to work with easier
+```{r}
+blackpoll$year<-as.integer(blackpoll$year)
+blackpoll$month<-as.integer(blackpoll$month)
+```
+
+Organizing data my band number and date within band number. Then determine the change in mass from the capture, to the recapture events assuming that the first mass measurement was a capture (what if it wasn't??)
+```{r}
+bp.sorted <- blackpoll %>%
+  group_by(band) %>%
+  arrange(band,date) %>%
+  mutate(diff_mass=mass-first(mass)) %>% 
+  data.frame()
+```
+Change zeros to NA, then omit the NAs from being graphed
+```{r}
+bp.sorted2 <- bp.sorted[bp.sorted==0] <- NA
+bp.sorted2 <- na.omit(bp.sorted)
+```
+
+WE NEED TO KEEP ZEROS FOR RECAPTURED BIRDS.
+
+Graph
+```{r}
+ggplot(bp.sorted, aes(caught, diff_mass, colour = band, group = band))+
+  geom_point()+
+  geom_line()+
+  facet_wrap(~location, nrow = 1)+
+  theme(legend.position = 'none')
+```
+
+
