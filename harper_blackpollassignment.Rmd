@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Loaded tidyverse
 ```{r}
 library(tidyverse)
 ```
@@ -24,6 +25,7 @@ Load date and time package
 ```{r}
 library(lubridate)
 ```
+
 Make date column
 ```{r}
 blackpoll <- blackpoll %>%
@@ -56,17 +58,15 @@ bp.sorted <- blackpoll %>%
   mutate(diff_mass=mass-first(mass)) %>% 
   data.frame()
 ```
-Change zeros to NA, then omit the NAs from being graphed
-```{r}
-bp.sorted2 <- bp.sorted[bp.sorted==0] <- NA
-bp.sorted2 <- na.omit(bp.sorted)
-```
 
-WE NEED TO KEEP ZEROS FOR RECAPTURED BIRDS.
+Get rid of non-recaptured birds
+```{r}
+bp.final <- filter(bp.sorted, recap == "R")
+```
 
 Graph
 ```{r}
-ggplot(bp.sorted, aes(caught, diff_mass, colour = band, group = band))+
+ggplot(bp.final, aes(caught, diff_mass, colour = band, group = band))+
   geom_point()+
   geom_line()+
   xlab("Time of Year")+
